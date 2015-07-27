@@ -81,7 +81,7 @@ getFiles = sequence . map getFile
 getFile ::
   FilePath
   -> IO (FilePath, Chars)
-getFile p = (,) <$> pure p <*> readFile p
+getFile = lift2 (lift2 (,)) pure readFile
 
 printFiles ::
   List (FilePath, Chars)
