@@ -128,7 +128,7 @@ option ::
   a
   -> Parser a
   -> Parser a
-option = (|||) . valueParser
+option = flip (|||) . valueParser
 
 -- | Write a parser that parses 1 or more digits.
 --
@@ -169,8 +169,7 @@ oneof = satisfy . flip elem
 noneof ::
   Chars
   -> Parser Char
-noneof =
-  error "todo: Course.MoreParser#noneof"
+noneof = satisfy . flip notElem
 
 -- | Write a function that applies the first parser, runs the third parser keeping the result,
 -- then runs the second parser and produces the obtained result.
@@ -280,7 +279,7 @@ sepby1 ::
   Parser a
   -> Parser s
   -> Parser (List a)
-sepby1 = (list .) . (<*)
+sepby1 p s = lift2 (:.) p (list (s *> p))
 
 -- | Write a function that produces a list of values coming off the given parser,
 -- separated by the second given parser.
@@ -302,7 +301,7 @@ sepby ::
   Parser a
   -> Parser s
   -> Parser (List a)
-sepby = ((valueParser Nil |||) .) . sepby1
+sepby = ((||| valueParser Nil) .) . sepby1
 
 -- | Write a parser that asserts that there is no remaining input.
 --
@@ -386,5 +385,4 @@ betweenSepbyComma ::
   -> Char
   -> Parser a
   -> Parser (List a)
-betweenSepbyComma =
-  error "todo: Course.MoreParser#betweenSepbyComma"
+betweenSepbyComma l r m = betweenCharTok l r (sepby m (is ','))
