@@ -233,8 +233,7 @@ betweenCharTok l r = between (charTok l) (charTok r)
 -- True
 hex ::
   Parser Char
-hex =
-  error "todo: Course.MoreParser#hex"
+hex = chr . (?? 0) . readHex <$> replicateA 4 (satisfy isHexDigit)
 
 -- | Write a function that parses the character 'u' followed by 4 hex digits and return the character value.
 --
@@ -256,8 +255,7 @@ hex =
 -- True
 hexu ::
   Parser Char
-hexu =
-  error "todo: Course.MoreParser#hexu"
+hexu = is 'u' *> hex
 
 -- | Write a function that produces a non-empty list of values coming off the given parser (which must succeed at least once),
 -- separated by the second given parser.
@@ -385,4 +383,4 @@ betweenSepbyComma ::
   -> Char
   -> Parser a
   -> Parser (List a)
-betweenSepbyComma l r m = betweenCharTok l r (sepby m (is ','))
+betweenSepbyComma l r m = betweenCharTok l r (sepby m (charTok ','))
